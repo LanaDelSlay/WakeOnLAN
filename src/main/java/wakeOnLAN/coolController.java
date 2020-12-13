@@ -1,5 +1,6 @@
 package wakeOnLAN;
 
+import java.awt.FileDialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,12 +11,15 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,7 +39,6 @@ public class coolController {
     @FXML
     private Button saveBtn;
     
-
     @FXML
     private TextField ipTextF;
 
@@ -48,34 +51,70 @@ public class coolController {
     @FXML
     void load(ActionEvent event) {
         JFileChooser f = new JFileChooser();
-    	String userDir = System.getProperty("user.home");
-        String dataFolder = userDir + File.separator + "WOL_data";
+        String dataFolder = System.getProperty("user.home") + File.separator + "WOL_data";
         File file = new File(dataFolder);
-        f.setCurrentDirectory(file);
-        f.setFileSelectionMode(JFileChooser.FILES_ONLY); 
-        f.showSaveDialog(null);
+        String OS = System.getProperty("os.name");
+        System.out.println(OS);
+        if (OS.contains("Windows")) {
+        	  f.setCurrentDirectory(file);
+              f.setFileSelectionMode(JFileChooser.FILES_ONLY); 
+              f.showSaveDialog(null);
+              
+              try {
+      			FileInputStream fileIn = new FileInputStream(f.getSelectedFile());
+      			ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+      			Object obj = objectIn.readObject();
+      			lanConnection lc = (lanConnection) obj;
+      			ipTextF.setText(lc.getIP());
+      			macTextF.setText(lc.getMac());
+      			feedbackLabel.setText("Loaded!");
+      			
+      		} catch (FileNotFoundException e) {
+      			feedbackLabel.setText("ERROR: File not found");
+      			e.printStackTrace();
+      		} catch (IOException e) {
+      			// TODO Auto-generated catch block
+      			feedbackLabel.setText("ERROR: File may be corrupt.");
+      			e.printStackTrace();
+      		} catch (ClassNotFoundException e) {
+      			// TODO Auto-generated catch block
+      			feedbackLabel.setText("ERROR");
+      			e.printStackTrace();
+      		} catch (NullPointerException e) {
+      			feedbackLabel.setText("No File selected");
+      		}
+        } else {
+        	JFrame frame = new JFrame();
+        	FileDialog fd = new FileDialog(frame, "Choose a device", FileDialog.LOAD);
+        	fd.setDirectory(dataFolder);
+        	//fd.setFile(file);
+        	fd.setVisible(true);
+        	FileInputStream fileIn;
+			try {
+				fileIn = new FileInputStream(fd.getFile());
+				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+	  			Object obj = objectIn.readObject();
+	  			lanConnection lc = (lanConnection) obj;
+	  			ipTextF.setText(lc.getIP());
+	  			macTextF.setText(lc.getMac());
+	  			feedbackLabel.setText("Loaded!");
+			} catch (FileNotFoundException e) {
+      			feedbackLabel.setText("ERROR: File not found");
+				e.printStackTrace();
+			} catch (IOException e) {
+      			feedbackLabel.setText("ERROR: File may be corrupt.");
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+      			feedbackLabel.setText("ERROR");
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+      			feedbackLabel.setText("No File selected");
+      		}
+  		
+        }
+      
         
-        try {
-			FileInputStream fileIn = new FileInputStream(f.getSelectedFile());
-			ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-			Object obj = objectIn.readObject();
-			lanConnection lc = (lanConnection) obj;
-			ipTextF.setText(lc.getIP());
-			macTextF.setText(lc.getMac());
-			feedbackLabel.setText("Loaded!");
-			
-		} catch (FileNotFoundException e) {
-			feedbackLabel.setText("ERROR: File not found");
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			feedbackLabel.setText("ERROR: File may be corrupt.");
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			feedbackLabel.setText("ERROR");
-			e.printStackTrace();
-		}
+        
 
     }
 
@@ -86,6 +125,7 @@ public class coolController {
     	String mac = macTextF.getText();
     	String userDir = System.getProperty("user.home");
     	String dataFolder = userDir + File.separator + "WOL_data";
+    	System.out.println(dataFolder);
     	Files.createDirectories(Paths.get(dataFolder));
     		if(verifyInput(ip, mac, feedbackLabel)) {
                 FileOutputStream fileOut = new FileOutputStream(dataFolder + File.separator + ip);
@@ -130,18 +170,23 @@ public class coolController {
         		feedbackLabel.setTextFill(Color.GREEN);
                 feedbackLabel.setText("Wake-on-LAN packet sent.");
             }
-            catch (Exception e) {
+            catch (UnknownHostException e) {
         		feedbackLabel.setTextFill(Color.RED);
             	feedbackLabel.setText("Failed to send Wake-on-LAN packet:");
                 System.out.println(e);
                 System.exit(1);
-            }
+            } catch (SocketException e) {
+            	feedbackLabel.setTextFill(Color.RED);
+            	feedbackLabel.setText("Failed to send Wake-on-LAN packet:");
+            	e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	
 
     	}
     	
-    
-
     private static byte[] getMacBytes(String macStr) throws IllegalArgumentException {
         byte[] bytes = new byte[6];
         String[] hex = macStr.split("(\\:|\\-)");
