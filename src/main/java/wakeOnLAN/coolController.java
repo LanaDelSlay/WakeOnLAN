@@ -1,5 +1,6 @@
 package wakeOnLAN;
 
+import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +30,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
 public class coolController {
-
+	
     @FXML
     private Button loadBtn;
 
@@ -49,12 +50,12 @@ public class coolController {
     private Label feedbackLabel;
 
     @FXML
-    void load(ActionEvent event) {
+    void load(ActionEvent event) throws Exception {
         JFileChooser f = new JFileChooser();
         String dataFolder = System.getProperty("user.home") + File.separator + "WOL_data";
         File file = new File(dataFolder);
         String OS = System.getProperty("os.name");
-        System.out.println(OS);
+        
         if (OS.contains("Windows")) {
         	  f.setCurrentDirectory(file);
               f.setFileSelectionMode(JFileChooser.FILES_ONLY); 
@@ -84,36 +85,10 @@ public class coolController {
       			feedbackLabel.setText("No File selected");
       		}
         } else {
-        	JFrame frame = new JFrame();
-        	FileDialog fd = new FileDialog(frame, "Choose a device", FileDialog.LOAD);
-        	fd.setDirectory(dataFolder);
-        	//fd.setFile(file);
-        	fd.setVisible(true);
-        	FileInputStream fileIn;
-			try {
-				fileIn = new FileInputStream(fd.getFile());
-				ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-	  			Object obj = objectIn.readObject();
-	  			lanConnection lc = (lanConnection) obj;
-	  			ipTextF.setText(lc.getIP());
-	  			macTextF.setText(lc.getMac());
-	  			feedbackLabel.setText("Loaded!");
-			} catch (FileNotFoundException e) {
-      			feedbackLabel.setText("ERROR: File not found");
-				e.printStackTrace();
-			} catch (IOException e) {
-      			feedbackLabel.setText("ERROR: File may be corrupt.");
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-      			feedbackLabel.setText("ERROR");
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-      			feedbackLabel.setText("No File selected");
-      		}
-  		
+        	macFileDialog t = new macFileDialog(ipTextF, macTextF, feedbackLabel);
+        	t.start();
+        	
         }
-      
-        
         
 
     }
@@ -125,7 +100,6 @@ public class coolController {
     	String mac = macTextF.getText();
     	String userDir = System.getProperty("user.home");
     	String dataFolder = userDir + File.separator + "WOL_data";
-    	System.out.println(dataFolder);
     	Files.createDirectories(Paths.get(dataFolder));
     		if(verifyInput(ip, mac, feedbackLabel)) {
                 FileOutputStream fileOut = new FileOutputStream(dataFolder + File.separator + ip);
@@ -205,6 +179,8 @@ public class coolController {
     }
     
     private static Boolean verifyInput(String ip, String mac, Label feedbackLabel) {
+
+    	
 		feedbackLabel.setTextFill(Color.RED);
     	feedbackLabel.setVisible(false);
     	String ipReg = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"; 
