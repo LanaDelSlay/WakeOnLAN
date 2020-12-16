@@ -87,10 +87,8 @@ public class coolController {
         } else {
         	macFileDialog t = new macFileDialog(ipTextF, macTextF, feedbackLabel);
         	t.start();
-        	
         }
         
-
     }
 
     @FXML
@@ -118,12 +116,7 @@ public class coolController {
 		feedbackLabel.setVisible(false);
     	String ip = ipTextF.getText(); 
     	String mac = macTextF.getText();
-    	String ipReg = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"; 
-    	String macReg = "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}\\\\.[0-9a-fA-F]{4}\\\\.[0-9a-fA-F]{4})$";
-    	Pattern ipPattern = Pattern.compile(ipReg);
-    	Pattern macPattern = Pattern.compile(macReg);
-    	Matcher ipMatch = ipPattern.matcher(ip);
-    	Matcher macMatch = macPattern.matcher(mac);
+
     	
     	if(verifyInput(ip,mac,feedbackLabel)) 
         	try {
@@ -178,9 +171,7 @@ public class coolController {
         return bytes;
     }
     
-    private static Boolean verifyInput(String ip, String mac, Label feedbackLabel) {
-
-    	
+    private static Boolean verifyInput(String ip, String mac, Label feedbackLabel) {    	
 		feedbackLabel.setTextFill(Color.RED);
     	feedbackLabel.setVisible(false);
     	String ipReg = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"; 

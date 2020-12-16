@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 
 public class macFileDialog extends Thread{ 
 	
@@ -27,21 +28,14 @@ public class macFileDialog extends Thread{
 	Label feedbackLabel;
 	FileInputStream fileIn;
 	
-//Bringin up UI just fine
 	public void run(){
 		String dataFolder = System.getProperty("user.home") + File.separator + "WOL_data";
 		JFrame frame = new JFrame();
 		FileDialog fd = new FileDialog(frame, "Choose a file", FileDialog.LOAD);
 		fd.setDirectory(dataFolder);
 		fd.setVisible(true);
-		String filename = fd.getFile();
-		
-		System.out.println(filename);
-		System.out.println(fd.getDirectory()+fd.getFile());		
-		
 		ObjectInputStream objectIn;
 		try {
-			
 			fileIn = new FileInputStream(fd.getDirectory()+fd.getFile());
 			objectIn = new ObjectInputStream(fileIn);
 			Object obj = objectIn.readObject();
