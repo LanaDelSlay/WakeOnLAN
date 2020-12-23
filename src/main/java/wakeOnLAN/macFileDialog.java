@@ -1,6 +1,7 @@
 package wakeOnLAN;
 
 import java.awt.FileDialog;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,17 +17,21 @@ import javafx.scene.paint.Color;
 
 public class macFileDialog extends Thread{ 
 	
-	public macFileDialog(TextField ipTextF, TextField macTextF, Label feedbackLabel) {
-		super();
-		this.ipTextF = ipTextF;
-		this.macTextF = macTextF;
-		this.feedbackLabel = feedbackLabel;
-	}
-
 	TextField ipTextF;
 	TextField macTextF;
 	Label feedbackLabel;
 	FileInputStream fileIn;
+	Label loadedComputerLabel;
+	
+	public macFileDialog(TextField ipTextF, TextField macTextF, Label feedbackLabel, Label loadedComputerLabel) {
+		super();
+		this.ipTextF = ipTextF;
+		this.macTextF = macTextF;
+		this.feedbackLabel = feedbackLabel;
+		this.loadedComputerLabel = loadedComputerLabel;
+	}
+
+
 	
 	public void run(){
 		String dataFolder = System.getProperty("user.home") + File.separator + "WOL_data";
@@ -42,14 +47,58 @@ public class macFileDialog extends Thread{
 			lanConnection lc = (lanConnection) obj;
 			ipTextF.setText(lc.getIP());
 			macTextF.setText(lc.getMac());
+			Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					loadedComputerLabel.setText(lc.getNickname());
+					feedbackLabel.setText("File loaded");
+				}
+				});
+
 			
-		} catch (IOException e) {
+			
+		} catch (EOFException e) {
+			Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					feedbackLabel.setTextFill(Color.RED);
+					feedbackLabel.setVisible(true);
+					feedbackLabel.setText("File is corrupt");
+				}
+				});			
+		} catch (FileNotFoundException e) {
+			Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					feedbackLabel.setTextFill(Color.RED);
+					feedbackLabel.setVisible(true);
+					feedbackLabel.setText("No file selected");
+				}
+				});		
+
+		}
+		
+		catch (IOException e) {
+			Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					feedbackLabel.setTextFill(Color.RED);
+					feedbackLabel.setVisible(true);
+					feedbackLabel.setText("Error loading file");
+				}
+				});
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			Platform.runLater(new Runnable(){
+				@Override
+				public void run() {
+					feedbackLabel.setTextFill(Color.RED);
+					feedbackLabel.setVisible(true);
+					feedbackLabel.setText("Error loading file");
+				}
+				});			e.printStackTrace();
+		} 
 		
 		
 	    }

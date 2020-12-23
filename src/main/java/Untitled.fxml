@@ -19,7 +19,7 @@
          </font>
       </Label>
       <Label fx:id="feedbackLabel" alignment="TOP_LEFT" layoutX="18.0" layoutY="113.0" prefHeight="34.0" prefWidth="150.0" text="Label" textFill="RED" visible="false" wrapText="true" />
-      <TextField id="compNameTextF" fx:id="compNameTextF" layoutX="16.0" layoutY="120.0" promptText="Computer Name" visible="false" />
-      <Label fx:id="loadedComputerLabel" alignment="CENTER" layoutX="29.0" layoutY="28.0" prefHeight="17.0" prefWidth="131.0" textAlignment="CENTER" textFill="#77ff00" />
+      <TextField id="compNameTextF" fx:id="compNameTextF" layoutX="16.0" layoutY="117.0" promptText="Computer Name" visible="false" />
+      <Label fx:id="loadedComputerLabel" alignment="CENTER" layoutX="29.0" layoutY="28.0" prefHeight="17.0" prefWidth="131.0" textAlignment="CENTER" />
    </children>
 </AnchorPane>

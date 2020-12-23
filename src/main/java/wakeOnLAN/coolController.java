@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -50,7 +51,16 @@ public class coolController {
     private Label feedbackLabel;
 
     @FXML
+    private TextField compNameTextF;
+
+    @FXML
+    private Label loadedComputerLabel;
+    
+    @FXML
     void load(ActionEvent event) throws Exception {
+    	compNameTextF.setVisible(false);
+		feedbackLabel.setVisible(false);
+        loadedComputerLabel.setText("");
         JFileChooser f = new JFileChooser();
         String dataFolder = System.getProperty("user.home") + File.separator + "WOL_data";
         File file = new File(dataFolder);
@@ -68,6 +78,7 @@ public class coolController {
       			lanConnection lc = (lanConnection) obj;
       			ipTextF.setText(lc.getIP());
       			macTextF.setText(lc.getMac());
+      			loadedComputerLabel.setText(lc.getNickname() + " selected.");
       			feedbackLabel.setText("Loaded!");
       			
       		} catch (FileNotFoundException e) {
@@ -85,14 +96,16 @@ public class coolController {
       			feedbackLabel.setText("No File selected");
       		}
         } else {
-        	macFileDialog t = new macFileDialog(ipTextF, macTextF, feedbackLabel);
+        	macFileDialog t = new macFileDialog(ipTextF, macTextF, feedbackLabel,loadedComputerLabel);
         	t.start();
+        	
         }
         
     }
 
     @FXML
     void save(ActionEvent event) throws IOException {
+    	String name;
 		feedbackLabel.setTextFill(Color.GREEN);
     	String ip = ipTextF.getText(); 
     	String mac = macTextF.getText();
@@ -100,18 +113,31 @@ public class coolController {
     	String dataFolder = userDir + File.separator + "WOL_data";
     	Files.createDirectories(Paths.get(dataFolder));
     		if(verifyInput(ip, mac, feedbackLabel)) {
-                FileOutputStream fileOut = new FileOutputStream(dataFolder + File.separator + ip);
-                ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-                lanConnection lc = new lanConnection(ip,mac);
+                
+                if(compNameTextF.getText().isBlank()||!compNameTextF.isVisible()) {
+                	compNameTextF.setVisible(true);
+                    loadedComputerLabel.setText("Please enter a name");    
+                } else {
+                	FileOutputStream fileOut = new FileOutputStream(dataFolder + File.separator + compNameTextF.getText());
+                    ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+                name = compNameTextF.getText();
+                lanConnection lc = new lanConnection(ip,mac,name);
                 objectOut.writeObject(lc);
                 objectOut.close();
+                feedbackLabel.setVisible(true);
+                feedbackLabel.setTextFill(Color.GREEN);
                 feedbackLabel.setText("Saved!");
+                compNameTextF.setVisible(false);
+                loadedComputerLabel.setText("");
+                }
     		}
         
     }
 
     @FXML
     void wake(ActionEvent event) {
+    	compNameTextF.setVisible(false);
+        loadedComputerLabel.setText("");
 		feedbackLabel.setTextFill(Color.RED);
 		feedbackLabel.setVisible(false);
     	String ip = ipTextF.getText(); 
@@ -136,15 +162,18 @@ public class coolController {
                 socket.close();
         		feedbackLabel.setTextFill(Color.GREEN);
                 feedbackLabel.setText("Wake-on-LAN packet sent.");
+        		feedbackLabel.setVisible(true);
             }
             catch (UnknownHostException e) {
         		feedbackLabel.setTextFill(Color.RED);
             	feedbackLabel.setText("Failed to send Wake-on-LAN packet:");
+        		feedbackLabel.setVisible(true);
                 System.out.println(e);
                 System.exit(1);
             } catch (SocketException e) {
             	feedbackLabel.setTextFill(Color.RED);
             	feedbackLabel.setText("Failed to send Wake-on-LAN packet:");
+        		feedbackLabel.setVisible(true);
             	e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -206,9 +235,6 @@ public class coolController {
     		feedbackLabel.setText("Mac is invalid!");
     		return false;
     	}  else {
-    		feedbackLabel.setVisible(true);
-    		feedbackLabel.setTextFill(Color.GREEN);
-    		feedbackLabel.setText("Saving info!");
     		return true;
     		
     }
