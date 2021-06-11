@@ -6,11 +6,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="189.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wakeOnLAN.coolController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="189.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wakeOnLAN.coolController">
    <children>
-      <Button fx:id="loadBtn" layoutX="18.0" layoutY="151.0" mnemonicParsing="false" onAction="#load" text="Load" />
-      <Button fx:id="wakeBtn" layoutX="121.0" layoutY="151.0" mnemonicParsing="false" onAction="#wake" text="Wake" />
-      <Button fx:id="saveBtn" layoutX="70.0" layoutY="151.0" mnemonicParsing="false" onAction="#save" text="Save" />
+      <Button fx:id="wakeBtn" layoutX="97.0" layoutY="152.0" mnemonicParsing="false" onAction="#wake" text="Wake" />
+      <Button fx:id="saveBtn" layoutX="46.0" layoutY="152.0" mnemonicParsing="false" onAction="#save" text="Save" />
       <TextField id="ipTextF" fx:id="ipTextF" layoutX="16.0" layoutY="48.0" promptText="IP" />
       <TextField id="macTextF" fx:id="macTextF" layoutX="16.0" layoutY="84.0" promptText="MAC Address" />
       <Label layoutX="23.0" text="Wake On LAN">
