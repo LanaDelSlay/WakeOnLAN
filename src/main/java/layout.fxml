@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="189.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wakeOnLAN.coolController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="189.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wakeOnLAN.controller">
    <children>
       <Button fx:id="wakeBtn" layoutX="97.0" layoutY="152.0" mnemonicParsing="false" onAction="#wake" text="Wake" />
       <Button fx:id="saveBtn" layoutX="46.0" layoutY="152.0" mnemonicParsing="false" onAction="#save" text="Save" />

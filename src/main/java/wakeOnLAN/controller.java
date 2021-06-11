@@ -2,7 +2,6 @@ package wakeOnLAN;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -14,6 +13,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
-public class coolController {
+public class controller {
 
 	@FXML
 	private Button loadBtn;
@@ -93,37 +93,45 @@ public class coolController {
 
 	@SuppressWarnings("unchecked")
 	@FXML
-	void populateSuggestions() throws IOException {
+	void populateSuggestions() {
 		String pattern = "[^,]+";
-		File dataFile = new File(dataFolder + File.separator + "savedIPs.txt");
+		File dataFile = new File(dataFolder + File.separator + "savedIPs.dat");
 		URI dataURI = dataFile.toURI();
-		FileInputStream fileIn;
-		List<String> result = Files.readAllLines(Paths.get(dataURI));
-		Pattern p = Pattern.compile(pattern);
+		List<String> result;
+		try {
+			result = Files.readAllLines(Paths.get(dataURI));
+			Pattern p = Pattern.compile(pattern);
 
-		result.forEach(text -> {
-			Matcher m = p.matcher(text);
-			int i = 1;
-			while (m.find()) {
-				// Format is IP, MAC, then name!
-				switch (i) {
-				case 1:
-					ipStringArr.add(m.group());
-					break;
-				case 2:
-					macStringArr.add(m.group());
-					break;
-				case 3:
-					nameStringArr.add(m.group());
-					break;
+			result.forEach(text -> {
+				Matcher m = p.matcher(text);
+				int i = 1;
+				while (m.find()) {
+					// Format is IP, MAC, then name!
+					switch (i) {
+					case 1:
+						ipStringArr.add(m.group());
+						break;
+					case 2:
+						macStringArr.add(m.group());
+						break;
+					case 3:
+						nameStringArr.add(m.group());
+						break;
+					}
+				i++;
 				}
 
-				i++;
-			}
+			});
 
-		});
+		
+			
+		} catch (NoSuchFileException e1) {
+			// TODO Auto-generated catch block
+		} catch (Exception e) {
+			e.printStackTrace();
 
-		try {
+		}
+ 
 			@SuppressWarnings("rawtypes")
 			SuggestionProvider ipSuggestionProvider = SuggestionProvider.create(new ArrayList());
 			new AutoCompletionTextFieldBinding<>(ipTextF, ipSuggestionProvider);
@@ -134,15 +142,12 @@ public class coolController {
 			@SuppressWarnings("rawtypes")
 			SuggestionProvider macSuggestionProvider = SuggestionProvider.create(new ArrayList());
 			new AutoCompletionTextFieldBinding<>(macTextF, macSuggestionProvider);
-			macSuggestionProvider.addPossibleSuggestions("BD-C9-E7-D4-FF-04");
 			macSuggestionProvider.addPossibleSuggestions(macStringArr);
 
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+		
 		ipTextF.setText("");
 		macTextF.setText("");
-		// feedbackLabel.setText("Loaded!");
+ 	
 	}
 
 	@FXML
@@ -159,7 +164,7 @@ public class coolController {
 			} else {
 				name = compNameTextF.getText();
 				try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream(dataFolder + File.separator + "savedIPs.txt", true), "utf-8"))) {
+						new FileOutputStream(dataFolder + File.separator + "savedIPs.dat", true), "utf-8"))) {
 					writer.append("\n" + ip + "," + mac + "," + name);
 				}
 				feedbackLabel.setVisible(true);
@@ -211,7 +216,6 @@ public class coolController {
 				e.printStackTrace();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 	}
 
